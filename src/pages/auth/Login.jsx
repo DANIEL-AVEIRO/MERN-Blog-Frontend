@@ -1,6 +1,33 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../../api/services/auth";
+import { toast } from "react-toastify";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await login({ email, password });
+      localStorage.setItem("token", response.token);
+      toast.success(response.message);
+      navigate("/");
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="mb-8">
@@ -13,7 +40,7 @@ const Login = () => {
         </p>
       </div>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         {/* Email */}
         <div>
           <label
@@ -26,8 +53,10 @@ const Login = () => {
           <input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder="Enter your email"
             className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-black"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
@@ -45,14 +74,17 @@ const Login = () => {
             type="password"
             placeholder="Enter your password"
             className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-black"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
         <button
           type="submit"
           className="mt-6 w-full rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+          disabled={loading}
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
 

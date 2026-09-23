@@ -1,19 +1,47 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { register } from "../../api/services/auth";
+import { toast } from "react-toastify";
+import { useState } from "react";
 
 const Register = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name || !email || !password || !confirmPassword) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const response = await register({ name, email, password });
+      localStorage.setItem("token", response.token);
+      toast.success(response.message);
+      navigate("/");
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-950">
-          Create an account
-        </h1>
-
-        <p className="mt-2 text-sm text-gray-500">
-          Sign up to start creating and managing posts.
-        </p>
-      </div>
-
-      <form>
+      <form onSubmit={handleSubmit}>
         {/* Name */}
         <div>
           <label
@@ -28,6 +56,8 @@ const Register = () => {
             type="text"
             placeholder="Your name"
             className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-black"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
         </div>
 
@@ -45,6 +75,8 @@ const Register = () => {
             type="email"
             placeholder="you@example.com"
             className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-black"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
@@ -62,6 +94,8 @@ const Register = () => {
             type="password"
             placeholder="Create a password"
             className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-black"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
@@ -79,14 +113,17 @@ const Register = () => {
             type="password"
             placeholder="Confirm your password"
             className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-black"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </div>
 
         <button
           type="submit"
           className="mt-6 w-full rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+          disabled={loading}
         >
-          Create Account
+          {loading ? "Creating account..." : "Create Account"}
         </button>
       </form>
 
