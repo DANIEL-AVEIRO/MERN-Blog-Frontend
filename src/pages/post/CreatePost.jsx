@@ -1,6 +1,17 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { categoryList } from "../../api/services/category.js";
 
 const CreatePost = () => {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await categoryList();
+      setCategories(response.data);
+    };
+    fetchCategories();
+  }, []);
   return (
     <section className="mx-auto max-w-3xl px-6 py-12">
       <div className="mb-8">
@@ -51,13 +62,13 @@ const CreatePost = () => {
             id="category"
             className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-black"
           >
-            <option value="">Select a category</option>
+            <option value="" disabled>
+              Select a category
+            </option>
 
-            <option value="technology">Technology</option>
-
-            <option value="javascript">JavaScript</option>
-
-            <option value="backend">Backend</option>
+            {categories.map((category) => {
+              return <option value={category._id}>{category.name}</option>;
+            })}
           </select>
         </div>
 
@@ -97,6 +108,6 @@ const CreatePost = () => {
       </form>
     </section>
   );
-}
+};
 
 export default CreatePost;
