@@ -1,33 +1,16 @@
 import { Link } from "react-router-dom";
-
-const posts = [
-  {
-    id: 1,
-    title: "Getting Started with MERN Stack",
-    description:
-      "Learn how MongoDB, Express, React and Node.js work together to build modern web applications.",
-    category: "Technology",
-    date: "September 15, 2026",
-  },
-  {
-    id: 2,
-    title: "Understanding Async JavaScript",
-    description:
-      "Understand promises, async functions and how asynchronous code works in JavaScript.",
-    category: "JavaScript",
-    date: "September 12, 2026",
-  },
-  {
-    id: 3,
-    title: "Building REST APIs with Express",
-    description:
-      "Learn how to structure an Express backend with routes, controllers and services.",
-    category: "Backend",
-    date: "September 10, 2026",
-  },
-];
+import { postList } from "../../api/services/post";
+import { useEffect, useState } from "react";
 
 const Posts = () => {
+  const [posts, setPosts] = useState([]);
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const response = await postList();
+      setPosts(response.data);
+    };
+    fetchPosts();
+  }, []);
   return (
     <section className="mx-auto max-w-7xl px-6 py-12">
       {/* Header */}
@@ -56,15 +39,15 @@ const Posts = () => {
       <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {posts.map((post) => (
           <article
-            key={post.id}
+            key={post._id}
             className="flex flex-col rounded-2xl border border-gray-200 bg-white p-6 transition hover:-translate-y-1 hover:shadow-md"
           >
             <div className="flex items-center justify-between">
               <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
-                {post.category}
+                {post.category.name}
               </span>
 
-              <span className="text-xs text-gray-400">{post.date}</span>
+              <span className="text-xs text-gray-400">{post.createdAt}</span>
             </div>
 
             <h2 className="mt-5 text-xl font-semibold text-gray-950">
@@ -76,7 +59,7 @@ const Posts = () => {
             </p>
 
             <Link
-              to={`/posts/${post.id}`}
+              to={`/posts/${post._id}`}
               className="mt-6 text-sm font-semibold text-black"
             >
               Read article →
@@ -86,6 +69,6 @@ const Posts = () => {
       </div>
     </section>
   );
-}
+};
 
 export default Posts;

@@ -1,9 +1,33 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { categoryList } from "../../api/services/category.js";
+import { toast } from "react-toastify";
+import { postCreate } from "../../api/services/post.js";
 
 const CreatePost = () => {
   const [categories, setCategories] = useState([]);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!title || !description || !category) {
+      toast.warn("All fields are required");
+    }
+    setLoading(true);
+    try {
+      const response = await postCreate({ title, description, category });
+      toast.success(response.message);
+      navigate("/posts");
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -31,7 +55,10 @@ const CreatePost = () => {
         </p>
       </div>
 
-      <form className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8"
+      >
         {/* Title */}
         <div>
           <label
@@ -46,6 +73,8 @@ const CreatePost = () => {
             type="text"
             placeholder="Enter post title"
             className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-black"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
@@ -60,9 +89,11 @@ const CreatePost = () => {
 
           <select
             id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
             className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-black"
           >
-            <option value="" disabled>
+            <option value="" disabled selected>
               Select a category
             </option>
 
@@ -84,6 +115,8 @@ const CreatePost = () => {
           <textarea
             id="description"
             rows="8"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             placeholder="Write your post..."
             className="mt-2 w-full resize-y rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-black"
           />
@@ -101,8 +134,9 @@ const CreatePost = () => {
           <button
             type="submit"
             className="rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+            disabled={loading}
           >
-            Create Post
+            {loading ? "Creating Post....." : "Create Post"}
           </button>
         </div>
       </form>
