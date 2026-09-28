@@ -15,6 +15,7 @@ import Register from "./pages/auth/Register";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import Categories from "./pages/category/Categories";
+import PageNotFound from "./pages/PageNotFound";
 function App() {
   return (
     <BrowserRouter>
@@ -44,6 +45,7 @@ function App() {
 
           <Route path="/register" element={<Register />} />
         </Route>
+        <Route path="*" element={<PageNotFound/>}/>
       </Routes>
       <ToastContainer />
     </BrowserRouter>

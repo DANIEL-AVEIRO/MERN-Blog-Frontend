@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../api/services/auth";
 import { toast } from "react-toastify";
+import { EyeIcon, EyeOff } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [eyeToggle, setEyeToggle] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -61,7 +63,7 @@ const Login = () => {
         </div>
 
         {/* Password */}
-        <div className="mt-5">
+        <div className="mt-5 relative">
           <label
             htmlFor="password"
             className="block text-sm font-semibold text-gray-800"
@@ -71,12 +73,23 @@ const Login = () => {
 
           <input
             id="password"
-            type="password"
+            type={eyeToggle ? "text" : "password"}
             placeholder="Enter your password"
             className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-black"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          {eyeToggle ? (
+            <EyeOff
+              className="w-4 h-4 absolute right-4 bottom-4"
+              onClick={() => setEyeToggle(!eyeToggle)}
+            />
+          ) : (
+            <EyeIcon
+              className="w-4 h-4 absolute right-4 bottom-4"
+              onClick={() => setEyeToggle(!eyeToggle)}
+            />
+          )}
         </div>
 
         <button

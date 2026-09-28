@@ -1,11 +1,12 @@
 import api from "../axios";
 import endpoints from "../endpoints";
 
-export const postList = async () => {
-  const response = await api.get(endpoints.post.list);
+export const postList = async (search = "") => {
+  const response = await api.get(`${endpoints.post.list}/?search=${search}`);
   return response.data;
 };
 
+// http://localhost:8000/api/post/list/?search=keyword
 export const postCreate = async (data) => {
   const response = await api.post(endpoints.post.create, data);
   return response.data;
